@@ -73,6 +73,25 @@ func (s *driverSelector) Filter(inDevices []types.PciDevice) []types.PciDevice {
 	return filteredList
 }
 
+// NewMacAddressSelector returns a NetDevSelector interface for netDev list
+func NewMacAddressSelector(macAddresses []string) types.DeviceSelector {
+	return &macAddressSelector{macAddresses: macAddresses}
+}
+
+type macAddressSelector struct {
+	macAddresses []string
+}
+
+func (s *macAddressSelector) Filter(inDevices []types.PciDevice) []types.PciDevice {
+	filteredList := make([]types.PciDevice, 0)
+	for _, dev := range inDevices {
+		if contains(s.macAddresses, dev.GetMacAddr()) {
+			filteredList = append(filteredList, dev)
+		}
+	}
+	return filteredList
+}
+
 // NewPciAddressSelector returns a NetDevSelector interface for netDev list
 func NewPciAddressSelector(pciAddresses []string) types.DeviceSelector {
 	return &pciAddressSelector{pciAddresses: pciAddresses}
