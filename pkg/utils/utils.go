@@ -31,6 +31,7 @@ import (
 var (
 	sysBusPci = "/sys/bus/pci/devices"
 	devDir    = "/dev"
+	sysDir    = "/sys"
 )
 
 const (
@@ -63,7 +64,7 @@ func GetPfAddr(pciAddr string) (string, error) {
 
 // GetMacAddr returns the MAC address of the PCI device whose address is pciAddr
 func GetMacAddr(pciAddr string) (string, error) {
-	networkInfo, err := ghw.Network()
+	networkInfo, err := ghw.Network(ghw.WithPathOverrides(ghw.PathOverrides{"/sys": sysDir}))
 	if err != nil {
 		return "", fmt.Errorf("GetMacAddr(): error getting network info: %v", err)
 	}

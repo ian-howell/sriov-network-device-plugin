@@ -66,6 +66,7 @@ func (fs *FakeFilesystem) Use() func() {
 	}
 
 	sysBusPci = path.Join(fs.RootDir, "/sys/bus/pci/devices")
+	sysDir = path.Join(fs.RootDir, "/sys")
 
 	return func() {
 		// remove temporary fake fs
