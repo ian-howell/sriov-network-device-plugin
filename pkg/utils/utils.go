@@ -61,6 +61,7 @@ func GetPfAddr(pciAddr string) (string, error) {
 	return filepath.Base(pciinfo), nil
 }
 
+// GetMacAddr returns the MAC address of the PCI device whose address is pciAddr
 func GetMacAddr(pciAddr string) (string, error) {
 	networkInfo, err := ghw.Network()
 	if err != nil {
