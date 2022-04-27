@@ -518,4 +518,31 @@ var _ = Describe("In the utils package", func() {
 			},
 			"0000:01:10.0", 2, false),
 	)
+
+	DescribeTable("getting MAC Address of VF",
+		func(fs *FakeFilesystem, device string, expected string, shouldFail bool) {
+			defer fs.Use()()
+			actual, err := GetMacAddr(device)
+			Expect(actual).To(Equal(expected))
+			assertShouldFail(err, shouldFail)
+		},
+		Entry("device doesn't exist",
+			&FakeFilesystem{},
+			"0000:00:10.0", "", true),
+		Entry("device doesn't exist",
+			&FakeFilesystem{
+				Dirs: []string{"sys/class/net/", "sys/devices/net/eth0", "sys/0000:00:10.1"},
+				Files: map[string][]byte{
+					"sys/devices/net/eth0/addr_assign_type": []byte("0"),
+					"sys/devices/net/eth0/address":          []byte("00:11:22:33:44:55"),
+				},
+				Symlinks: map[string]string{
+					"sys/class/net/eth0":          "../../devices/net/eth0",
+					"sys/devices/net/eth0/device": "../../../0000:00:10.1",
+					"sys/0000:00:10.1/subsystem":  "../../../bus/pci",
+				},
+			},
+			"0000:00:10.1", "00:11:22:33:44:55", false),
+	)
+
 })
