@@ -27,6 +27,7 @@ import (
 type pciDevice struct {
 	basePciDevice *ghw.PCIDevice
 	pfAddr        string
+	macAddr       string
 	driver        string
 	vfID          int
 	numa          string
@@ -51,6 +52,12 @@ func NewPciDevice(dev *ghw.PCIDevice, rFactory types.ResourceFactory, infoProvid
 
 	// Get PF PCI address
 	pfAddr, err := utils.GetPfAddr(pciAddr)
+	if err != nil {
+		return nil, err
+	}
+
+	// Get MAC Address
+	macAddr, err := utils.GetMacAddr(pciAddr)
 	if err != nil {
 		return nil, err
 	}
@@ -89,6 +96,7 @@ func NewPciDevice(dev *ghw.PCIDevice, rFactory types.ResourceFactory, infoProvid
 	return &pciDevice{
 		basePciDevice: dev,
 		pfAddr:        pfAddr,
+		macAddr:       macAddr,
 		driver:        driverName,
 		vfID:          vfID,
 		apiDevice:     apiDevice,
@@ -99,6 +107,10 @@ func NewPciDevice(dev *ghw.PCIDevice, rFactory types.ResourceFactory, infoProvid
 
 func (pd *pciDevice) GetPfPciAddr() string {
 	return pd.pfAddr
+}
+
+func (pd *pciDevice) GetMacAddr() string {
+	return pd.macAddr
 }
 
 func (pd *pciDevice) GetVendor() string {

@@ -25,6 +25,7 @@ import (
 	"strings"
 
 	"github.com/golang/glog"
+	"github.com/jaypipes/ghw"
 )
 
 var (
@@ -58,6 +59,21 @@ func GetPfAddr(pciAddr string) (string, error) {
 		return "", fmt.Errorf("error getting PF for PCI device %s %v", pciAddr, err)
 	}
 	return filepath.Base(pciinfo), nil
+}
+
+func GetMacAddr(pciAddr string) (string, error) {
+	networkInfo, err := ghw.Network()
+	if err != nil {
+		return "", fmt.Errorf("GetMacAddr(): error getting network info: %v", err)
+	}
+
+	for _, nic := range networkInfo.NICs {
+		if nic.PCIAddress != nil && *nic.PCIAddress == pciAddr {
+			return nic.MacAddress, nil
+		}
+	}
+	return "", fmt.Errorf("error getting MAC address for PCI device %s %v", pciAddr, err)
+
 }
 
 // GetPfName returns SRIOV PF name for the given VF

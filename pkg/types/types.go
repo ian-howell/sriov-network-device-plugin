@@ -183,6 +183,7 @@ type PciDevice interface {
 	GetDeviceCode() string
 	GetPciAddr() string
 	GetPfPciAddr() string
+	GetMacAddr() string
 	IsSriovPF() bool
 	GetSubClass() string
 	GetDeviceSpecs() []*pluginapi.DeviceSpec
