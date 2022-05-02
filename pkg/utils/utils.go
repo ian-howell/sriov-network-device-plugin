@@ -62,6 +62,21 @@ func GetPfAddr(pciAddr string) (string, error) {
 	return filepath.Base(pciinfo), nil
 }
 
+// GetNICName returns NIC name of the PCI device whose address is pciAddr
+func GetNICName(pciAddr string) (string, error) {
+	networkInfo, err := ghw.Network(ghw.WithPathOverrides(ghw.PathOverrides{"/sys": sysDir}))
+	if err != nil {
+		return "", fmt.Errorf("GetNICName(): error getting network info: %v", err)
+	}
+
+	for _, nic := range networkInfo.NICs {
+		if nic.PCIAddress != nil && *nic.PCIAddress == pciAddr {
+			return nic.Name, nil
+		}
+	}
+	return "", fmt.Errorf("error getting NIC name for PCI device %s %v", pciAddr, err)
+}
+
 // GetMacAddr returns the MAC address of the PCI device whose address is pciAddr
 func GetMacAddr(pciAddr string) (string, error) {
 	networkInfo, err := ghw.Network(ghw.WithPathOverrides(ghw.PathOverrides{"/sys": sysDir}))
@@ -75,7 +90,6 @@ func GetMacAddr(pciAddr string) (string, error) {
 		}
 	}
 	return "", fmt.Errorf("error getting MAC address for PCI device %s %v", pciAddr, err)
-
 }
 
 // GetPfName returns SRIOV PF name for the given VF

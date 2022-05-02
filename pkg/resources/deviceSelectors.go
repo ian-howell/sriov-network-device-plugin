@@ -92,6 +92,25 @@ func (s *macAddressSelector) Filter(inDevices []types.PciDevice) []types.PciDevi
 	return filteredList
 }
 
+// NewNICNameSelector returns a NetDevSelector interface for netDev list
+func NewNICNameSelector(macAddresses []string) types.DeviceSelector {
+	return &macAddressSelector{macAddresses: macAddresses}
+}
+
+type nicNameSelector struct {
+	nicNames []string
+}
+
+func (s *nicNameSelector) Filter(inDevices []types.PciDevice) []types.PciDevice {
+	filteredList := make([]types.PciDevice, 0)
+	for _, dev := range inDevices {
+		if contains(s.nicNames, dev.GetNICName()) {
+			filteredList = append(filteredList, dev)
+		}
+	}
+	return filteredList
+}
+
 // NewPciAddressSelector returns a NetDevSelector interface for netDev list
 func NewPciAddressSelector(pciAddresses []string) types.DeviceSelector {
 	return &pciAddressSelector{pciAddresses: pciAddresses}

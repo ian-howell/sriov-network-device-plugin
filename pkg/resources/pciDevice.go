@@ -27,6 +27,7 @@ import (
 type pciDevice struct {
 	basePciDevice *ghw.PCIDevice
 	pfAddr        string
+	nicName       string
 	macAddr       string
 	driver        string
 	vfID          int
@@ -56,11 +57,11 @@ func NewPciDevice(dev *ghw.PCIDevice, rFactory types.ResourceFactory, infoProvid
 		return nil, err
 	}
 
-	// Get MAC Address
-	macAddr, err := utils.GetMacAddr(pciAddr)
-	if err != nil {
-		return nil, err
-	}
+	// Get NIC name. Ignoring the error because not all PCI Devices will be NICs
+	nicName, _ := utils.GetNICName(pciAddr)
+
+	// Get MAC Address. Ignoring the error because not all PCI Devices will have MAC addresses
+	macAddr, _ := utils.GetMacAddr(pciAddr)
 
 	// Get driver info
 	driverName, err := utils.GetDriverName(pciAddr)
@@ -96,6 +97,7 @@ func NewPciDevice(dev *ghw.PCIDevice, rFactory types.ResourceFactory, infoProvid
 	return &pciDevice{
 		basePciDevice: dev,
 		pfAddr:        pfAddr,
+		nicName:       nicName,
 		macAddr:       macAddr,
 		driver:        driverName,
 		vfID:          vfID,
@@ -107,6 +109,10 @@ func NewPciDevice(dev *ghw.PCIDevice, rFactory types.ResourceFactory, infoProvid
 
 func (pd *pciDevice) GetPfPciAddr() string {
 	return pd.pfAddr
+}
+
+func (pd *pciDevice) GetNICName() string {
+	return pd.nicName
 }
 
 func (pd *pciDevice) GetMacAddr() string {
