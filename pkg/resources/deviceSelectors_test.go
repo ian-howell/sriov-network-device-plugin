@@ -275,4 +275,24 @@ var _ = Describe("DeviceSelectors", func() {
 			})
 		})
 	})
+
+	Describe("nicName selector", func() {
+		Context("filtering", func() {
+			It("should return devices matching the correct NIC name", func() {
+				nicNames := []string{"net1"}
+				sel := resources.NewNicNameSelector(nicNames)
+
+				dev0 := mocks.PciNetDevice{}
+				dev0.On("GetNetName").Return("net1")
+				dev1 := mocks.PciNetDevice{}
+				dev1.On("GetNetName").Return("net2")
+
+				in := []types.HostDevice{&dev0, &dev1}
+				filtered := sel.Filter(in)
+
+				Expect(filtered).To(ContainElement(&dev0))
+				Expect(filtered).NotTo(ContainElement(&dev1))
+			})
+		})
+	})
 })
